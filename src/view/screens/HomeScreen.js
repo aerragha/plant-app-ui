@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,13 +12,37 @@ import {
 import COLORS from "../../consts/colors";
 import Icon from "@expo/vector-icons/MaterialIcons";
 import { TextInput } from "react-native-gesture-handler";
-import plants from "../../consts/plants";
+import plantsList from "../../consts/plants";
 
 const width = Dimensions.get("window").width / 2 - 30;
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const categories = ["POPULAR", "ORGANIC", "INDOORS", "SYNTHETIC"];
   const [categoryIndex, setCategoryIndex] = useState(0);
+  const [plants, setPlants] = useState([]);
+
+  useEffect(() => {
+    setPlants(
+      plantsList.filter((elm) => elm.category === categories[categoryIndex])
+    );
+  }, [categoryIndex]);
+
+
+  // const onChangeCategory = (index) => {
+  //   setCategoryIndex(index);
+  //   setPlants(plantsList.filter((elm) => elm.category === categories[index]));
+  // };
+
+  const onFavorate = (id) => {
+    setPlants(
+      plants.map((plant) => {
+        if (plant.id === id) {
+          return { ...plant, like: !plant.like };
+        }
+        return plant;
+      })
+    );
+  };
 
   const CategotyList = () => {
     return (
@@ -45,46 +69,77 @@ const HomeScreen = () => {
 
   const Card = ({ plant }) => {
     return (
-      <View style={style.card}>
-        <View
-          style={{
-            alignItems: "flex-end",
-          }}
-        >
+      <TouchableOpacity onPress={() => navigation.navigate("Details", plant)}>
+        <View style={style.card}>
           <View
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 15,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: plant.like
-                ? "rgba(245, 42, 42, 0.2)"
-                : "rgba(0, 0, 0, 0.2)",
+              alignItems: "flex-end",
             }}
           >
-            <Icon
-              name="favorite"
-              size={18}
-              color={plant.like ? COLORS.red : COLORS.dark}
+            <TouchableOpacity
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: plant.like
+                  ? "rgba(245, 42, 42, 0.2)"
+                  : "rgba(0, 0, 0, 0.2)",
+              }}
+              onPress={() => onFavorate(plant.id)}
+            >
+              <Icon
+                name="favorite"
+                size={18}
+                color={plant.like ? COLORS.red : COLORS.dark}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={{ height: 100, alignItems: "center" }}>
+            <Image
+              source={plant.img}
+              style={{ flex: 1, resizeMode: "contain" }}
             />
           </View>
+          <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 10 }}>
+            {plant.name}
+          </Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginTop: 5,
+            }}
+          >
+            <Text style={{ fontSize: 19, fontWeight: "bold" }}>
+              ${plant.price}
+            </Text>
+            <View
+              style={{
+                height: 25,
+                width: 25,
+                backgroundColor: COLORS.green,
+                borderRadius: 5,
+                justifyContent: "center",
+                alignItems: "center",
+                // paddingTop:
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 22,
+                  color: COLORS.white,
+                  fontWeight: "bold",
+                  marginTop: -3,
+                }}
+              >
+                +
+              </Text>
+            </View>
+          </View>
         </View>
-        <View style={{ height: 100, alignItems: "center" }}>
-          <Image
-            source={plant.img}
-            style={{ flex: 1, resizeMode: "contain" }}
-          />
-        </View>
-        <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 10 }}>
-          {plant.name}
-        </Text>
-        <View
-          style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}
-        >
-          <Text style={{fontSize: 19, fontWeight: 'bold'}}>{plant.price}</Text>
-        </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -121,9 +176,9 @@ const HomeScreen = () => {
           />
           <TextInput placeholder="Search" style={style.input} />
         </View>
-        <View style={style.sortBtn}>
+        <TouchableOpacity style={style.sortBtn}>
           <Icon name="sort" size={30} color={COLORS.white} />
-        </View>
+        </TouchableOpacity>
       </View>
       <CategotyList />
       <FlatList
