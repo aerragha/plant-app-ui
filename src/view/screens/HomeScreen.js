@@ -76,7 +76,14 @@ const HomeScreen = () => {
             style={{ flex: 1, resizeMode: "contain" }}
           />
         </View>
-        <Text>{plant.name}</Text>
+        <Text style={{ fontWeight: "bold", fontSize: 17, marginTop: 10 }}>
+          {plant.name}
+        </Text>
+        <View
+          style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 5 }}
+        >
+          <Text style={{fontSize: 19, fontWeight: 'bold'}}>{plant.price}</Text>
+        </View>
       </View>
     );
   };
@@ -87,8 +94,6 @@ const HomeScreen = () => {
         flex: 1,
         paddingHorizontal: 20,
         backgroundColor: COLORS.white,
-        // paddingLeft: Platform.OS === "ios" ? 30 : 20,
-        // paddingRight: Platform.OS === "ios" ? 30 : 20,
       }}
     >
       <View style={style.header}>
